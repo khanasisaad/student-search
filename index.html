@@ -56,7 +56,7 @@
       const id = document.getElementById("studentId").value.trim();
       if (!id) return;
 
-      const res = await fetch(`https://script.google.com/macros/s/AKfycbw4ytu5rJr4KbrBGV87hqsw-xqVSzOQS-Jq1OppaHDM4sNbq2XKWEZmZHoJmjjDSHslXw/exec?studentId=${id}`);
+      const res = await fetch(`https://script.google.com/macros/s/AKfycbwCGE1uLi5J2evWzhUvcZcp4kQ6W0dgB9tq4DPKZ-L40t7uJwZcrPTek5PCxqvCZn22RA/exec?studentId=${id}`);
       const data = await res.json();
 
       const resultDiv = document.getElementById("result");
