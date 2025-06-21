@@ -12,8 +12,18 @@
       padding: 2em 1em;
       text-align: center;
     }
-    h1 { color: #e65100; font-size: 2em; margin-bottom: 0.3em; }
-    .subtitle { margin-bottom: 1em; font-size: 1.1em; }
+
+    h1 {
+      color: #e65100;
+      font-size: 2em;
+      margin-bottom: 0.3em;
+    }
+
+    .subtitle {
+      margin-bottom: 1em;
+      font-size: 1.1em;
+    }
+
     input, button {
       font-size: 1em;
       padding: 0.8em;
@@ -23,6 +33,7 @@
       box-sizing: border-box;
       display: block;
     }
+
     button {
       background-color: #ff7043;
       color: white;
@@ -30,26 +41,80 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .result {
-      margin-top: 2em;
-      background: #fff;
-      padding: 1.5em;
-      border-radius: 10px;
-      max-width: 450px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      text-align: left;
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
       display: none;
+      z-index: 998;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-modal {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 2em 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      max-width: 90%;
+      width: 400px;
+      z-index: 999;
+      display: none;
+      animation: fadeInUp 0.3s ease;
+      text-align: center;
+    }
+
+    .result-modal .icon {
+      font-size: 48px;
+      margin-bottom: 1em;
+    }
+
+    .icon.success {
+      color: #43a047;
+    }
+
+    .icon.error {
+      color: #e53935;
+    }
+
+    #closeBtn {
+      margin-top: 1.5em;
+      padding: 0.6em 1.5em;
+      background-color: #888;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0 } to { opacity: 1 }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translate(-50%, -40%); }
+      to   { opacity: 1; transform: translate(-50%, -50%); }
     }
   </style>
 </head>
 <body>
   <h1>ระบบค้นหาข้อมูลนักเรียน</h1>
   <p class="subtitle"><strong>คณะสีแสด</strong></p>
+
   <input id="studentId" placeholder="กรอกรหัสประจำตัวนักเรียน" />
   <button onclick="searchStudent()">ค้นหา</button>
-  <div id="result" class="result"></div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div id="result" class="result-modal">
+    <div id="resultContent"></div>
+    <button id="closeBtn" onclick="closeResult()">ปิด</button>
+  </div>
 
   <script>
     async function searchStudent() {
@@ -60,21 +125,35 @@
       const data = await res.json();
 
       const resultDiv = document.getElementById("result");
+      const content = document.getElementById("resultContent");
+      const overlay = document.getElementById("overlay");
+
+      overlay.style.display = "block";
       resultDiv.style.display = "block";
 
       if (data.status === "success") {
-        resultDiv.innerHTML = `
+        content.innerHTML = `
+          <div class="icon success">✅</div>
           <strong>ห้อง:</strong> ${data.room}<br>
           <strong>เลขที่:</strong> ${data.number}<br>
           <strong>ชื่อ:</strong> ${data.prefix} ${data.firstname} ${data.lastname}<br>
           ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i+1}:</strong> ${r}<br>` : '').join('')}
         `;
       } else {
-        resultDiv.innerHTML = `
-          <strong style="color: #d32f2f;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br>
-          หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE เจ้าหน้าที่</a>
+        content.innerHTML = `
+          <div class="icon error">❌</div>
+          <div><strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong></div>
+          <div style="margin-top: 0.5em;">
+            หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ
+            <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
+          </div>
         `;
       }
+    }
+
+    function closeResult() {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
     }
   </script>
 </body>
