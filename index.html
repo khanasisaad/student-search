@@ -96,7 +96,13 @@
       font-weight: 600;
       color: #212121;
       text-align: center;
-      margin-bottom: 0.8em;
+      margin-bottom: 0.6em;
+    }
+
+    .room-number {
+      font-size: 1.05em;
+      margin-bottom: 1em;
+      color: #555;
     }
 
     .student-info {
@@ -130,7 +136,7 @@
   <h1>ระบบค้นหาข้อมูลนักเรียน</h1>
   <p class="subtitle"><strong>คณะสีแสด</strong></p>
 
-  <input id="studentId" placeholder="กรอกรหัสประจำตัวนักเรียน" />
+  <input id="studentId" placeholder="กรอกรหัสประจำตัวนักเรียน" onkeydown="if(event.key==='Enter') searchStudent()" />
   <button onclick="searchStudent()">ค้นหา</button>
 
   <div class="overlay" id="overlay" onclick="closeResult()"></div>
@@ -157,17 +163,16 @@
 
       if (data.status === "success") {
         content.innerHTML = `
-          <div class="status-icon success">✅</div>
+          <div class="status-icon success">✓</div>
           <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
+          <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
           <div class="student-info">
-            <strong>ห้อง:</strong> ${data.room}<br>
-            <strong>เลขที่:</strong> ${data.number}<br>
             ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i+1}:</strong> ${r}<br>` : '').join('')}
           </div>
         `;
       } else {
         content.innerHTML = `
-          <div class="status-icon error">❌</div>
+          <div class="status-icon error">✗</div>
           <div class="student-info" style="text-align:center;">
             <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
             หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
