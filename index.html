@@ -37,14 +37,18 @@
     }
     .dark-toggle {
       position: absolute;
-      top: 1em;
-      right: 1em;
+      top: 0.6em;
+      right: 0.6em;
       background: none;
       border: none;
-      font-size: 1.3em;
+      font-size: 1em;
       color: var(--fg);
       cursor: pointer;
       z-index: 1000;
+      opacity: 0.7;
+    }
+    .dark-toggle:hover {
+      opacity: 1;
     }
     .logo {
       width: 100px;
@@ -160,7 +164,7 @@
   </style>
 </head>
 <body>
-  <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+  <button class="dark-toggle" id="toggleMode" onclick="toggleDarkMode()">🌙</button>
   <img src="logo.jpg" alt="โลโก้" class="logo" />
   <h1>ระบบค้นหาข้อมูลนักเรียน</h1>
   <p class="subtitle"><strong>คณะสีแสด</strong></p>
@@ -178,46 +182,51 @@
     © 2025 โรงเรียนเมืองสุราษฎร์ธานี | พัฒนาโดยคณะสีแสด บงกชประภัสสร
   </footer>
 
-<script>
-  async function searchStudent() {
-    const id = document.getElementById("studentId").value.trim();
-    if (!id) return;
+  <script>
+    async function searchStudent() {
+      const id = document.getElementById("studentId").value.trim();
+      if (!id) return;
 
-    const res = await fetch(`https://script.google.com/macros/s/AKfycbwCGE1uLi5J2evWzhUvcZcp4kQ6W0dgB9tq4DPKZ-L40t7uJwZcrPTek5PCxqvCZn22RA/exec?studentId=${id}`);
-    const data = await res.json();
+      const res = await fetch(`https://script.google.com/macros/s/AKfycbwCGE1uLi5J2evWzhUvcZcp4kQ6W0dgB9tq4DPKZ-L40t7uJwZcrPTek5PCxqvCZn22RA/exec?studentId=${id}`);
+      const data = await res.json();
 
-    const resultDiv = document.getElementById("result");
-    const content = document.getElementById("resultContent");
-    const overlay = document.getElementById("overlay");
+      const resultDiv = document.getElementById("result");
+      const content = document.getElementById("resultContent");
+      const overlay = document.getElementById("overlay");
 
-    overlay.style.display = "block";
-    resultDiv.style.display = "block";
+      overlay.style.display = "block";
+      resultDiv.style.display = "block";
 
-    if (data.status === "success") {
-      content.innerHTML = `
-        <div class="status-icon success">✓</div>
-        <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
-        <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
-        <div class="student-info">
-          ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
-        </div>`;
-    } else {
-      content.innerHTML = `
-        <div class="status-icon error">✗</div>
-        <div class="student-info" style="text-align:center;">
-          <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
-          หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
-          <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
-        </div>`;
+      if (data.status === "success") {
+        content.innerHTML = `
+          <div class="status-icon success">✓</div>
+          <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
+          <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
+          <div class="student-info">
+            ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
+          </div>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="status-icon error">✗</div>
+          <div class="student-info" style="text-align:center;">
+            <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
+            หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
+            <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
+          </div>
+        `;
+      }
     }
-  }
 
-  function closeResult() {
-    document.getElementById("result").style.display = "none";
-    document.getElementById("overlay").style.display = "none";
-  }
+    function closeResult() {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    }
 
-  function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-  }
-</script>
+    function toggleDarkMode() {
+      const isDark = document.body.classList.toggle("dark-mode");
+      document.getElementById("toggleMode").textContent = isDark ? "🌞" : "🌙";
+    }
+  </script>
+</body>
+</html>
