@@ -2,19 +2,64 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
   <title>ระบบค้นหาข้อมูลนักเรียน</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg: #fff;
+      --fg: #212121;
+      --accent: #ff7043;
+      --popup: #fff;
+      --shadow: rgba(0, 0, 0, 0.2);
+      --border: #ddd;
+    }
+
+    body.dark-mode {
+      --bg: #121212;
+      --fg: #f5f5f5;
+      --accent: #ffab91;
+      --popup: #1e1e1e;
+      --shadow: rgba(255, 255, 255, 0.08);
+      --border: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       font-family: 'Prompt', sans-serif;
-      background: #fefefe;
-      padding: 2em 1em;
+      background: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      padding: 2em 1em 5em;
       text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      background: none;
+      border: none;
+      font-size: 1.3em;
+      color: var(--fg);
+      cursor: pointer;
+    }
+
+    .logo {
+      width: 100px;
+      margin: 0 auto 1em;
+      display: block;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
     }
 
     h1 {
-      color: #e65100;
+      color: var(--accent);
       font-size: 2em;
       margin-bottom: 0.3em;
     }
@@ -27,19 +72,24 @@
     input, button {
       font-size: 1em;
       padding: 0.8em;
-      max-width: 350px;
+      max-width: 400px;
       width: 100%;
       margin: 0.5em auto;
-      box-sizing: border-box;
-      display: block;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
     }
 
     button {
-      background-color: #ff7043;
+      background-color: var(--accent);
       color: white;
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 10px var(--shadow);
     }
 
     .overlay {
@@ -49,60 +99,56 @@
       background: rgba(0, 0, 0, 0.3);
       display: none;
       z-index: 998;
-      animation: fadeIn 0.3s ease;
     }
 
     .result-modal {
       position: fixed;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 2em 1.5em;
+      background: var(--popup);
+      padding: 1.5em 1em;
       border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      max-width: 90%;
-      width: 400px;
+      box-shadow: 0 20px 40px var(--shadow);
+      width: 95%;
+      max-width: 420px;
       z-index: 999;
       display: none;
-      animation: fadeInUp 0.3s ease;
       text-align: center;
+      color: var(--fg);
     }
 
     .status-icon {
       width: 70px; height: 70px;
-      line-height: 70px;
       border-radius: 50%;
       font-size: 36px;
       margin: 0 auto 1em;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 2px solid;
     }
 
     .status-icon.success {
-      background-color: #e6f4ea;
+      background: #e6f4ea;
       color: #2e7d32;
-      border: 2px solid #66bb6a;
+      border-color: #66bb6a;
     }
 
     .status-icon.error {
-      background-color: #ffebee;
+      background: #ffebee;
       color: #c62828;
-      border: 2px solid #ef5350;
+      border-color: #ef5350;
     }
 
     .student-name {
       font-size: 1.4em;
       font-weight: 600;
-      color: #212121;
-      text-align: center;
       margin-bottom: 0.6em;
     }
 
     .room-number {
       font-size: 1.05em;
       margin-bottom: 1em;
-      color: #555;
     }
 
     .student-info {
@@ -122,17 +168,19 @@
       font-family: inherit;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0 } to { opacity: 1 }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translate(-50%, -40%); }
-      to   { opacity: 1; transform: translate(-50%, -50%); }
+    footer {
+      font-size: 0.9em;
+      color: #777;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      margin-top: 4em;
+      padding-top: 1em;
     }
   </style>
 </head>
 <body>
+  <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+  <img src="logo.png" alt="โลโก้โรงเรียน" class="logo" />
   <h1>ระบบค้นหาข้อมูลนักเรียน</h1>
   <p class="subtitle"><strong>คณะสีแสด</strong></p>
 
@@ -140,11 +188,14 @@
   <button onclick="searchStudent()">ค้นหา</button>
 
   <div class="overlay" id="overlay" onclick="closeResult()"></div>
-
   <div id="result" class="result-modal">
     <div id="resultContent"></div>
     <button id="closeBtn" onclick="closeResult()">ปิด</button>
   </div>
+
+  <footer>
+    © 2025 โรงเรียนเมืองสุราษฎร์ธานี | พัฒนาโดยคณะสีแสด บงกชประภัสสร
+  </footer>
 
   <script>
     async function searchStudent() {
@@ -167,7 +218,7 @@
           <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
           <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
           <div class="student-info">
-            ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i+1}:</strong> ${r}<br>` : '').join('')}
+            ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
           </div>
         `;
       } else {
@@ -185,6 +236,10 @@
     function closeResult() {
       document.getElementById("result").style.display = "none";
       document.getElementById("overlay").style.display = "none";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
     }
   </script>
 </body>
