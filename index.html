@@ -14,21 +14,18 @@
       --shadow: rgba(0, 0, 0, 0.2);
       --border: #ddd;
     }
-
     body.dark-mode {
       --bg: #121212;
       --fg: #f5f5f5;
       --accent: #ffab91;
       --popup: #1e1e1e;
-      --shadow: rgba(255, 255, 255, 0.08);
+      --shadow: rgba(255,255,255,0.08);
       --border: #333;
     }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
-
     body {
       font-family: 'Prompt', sans-serif;
       background: var(--bg);
@@ -38,7 +35,6 @@
       text-align: center;
       transition: all 0.3s ease;
     }
-
     .dark-toggle {
       position: absolute;
       top: 1em;
@@ -48,27 +44,24 @@
       font-size: 1.3em;
       color: var(--fg);
       cursor: pointer;
+      z-index: 1000;
     }
-
     .logo {
       width: 100px;
-      margin: 0 auto 1em;
+      margin: 3em auto 1em;
       display: block;
       border-radius: 12px;
       box-shadow: 0 4px 12px var(--shadow);
     }
-
     h1 {
       color: var(--accent);
       font-size: 2em;
       margin-bottom: 0.3em;
     }
-
     .subtitle {
       margin-bottom: 1em;
       font-size: 1.1em;
     }
-
     input, button {
       font-size: 1em;
       padding: 0.8em;
@@ -80,18 +73,15 @@
       background: var(--bg);
       color: var(--fg);
     }
-
     button {
       background-color: var(--accent);
       color: white;
       border: none;
     }
-
     button:hover {
       transform: scale(1.02);
       box-shadow: 0 4px 10px var(--shadow);
     }
-
     .overlay {
       position: fixed;
       top: 0; left: 0;
@@ -100,7 +90,6 @@
       display: none;
       z-index: 998;
     }
-
     .result-modal {
       position: fixed;
       top: 50%; left: 50%;
@@ -116,7 +105,6 @@
       text-align: center;
       color: var(--fg);
     }
-
     .status-icon {
       width: 70px; height: 70px;
       border-radius: 50%;
@@ -127,36 +115,30 @@
       justify-content: center;
       border: 2px solid;
     }
-
     .status-icon.success {
       background: #e6f4ea;
       color: #2e7d32;
       border-color: #66bb6a;
     }
-
     .status-icon.error {
       background: #ffebee;
       color: #c62828;
       border-color: #ef5350;
     }
-
     .student-name {
       font-size: 1.4em;
       font-weight: 600;
       margin-bottom: 0.6em;
     }
-
     .room-number {
       font-size: 1.05em;
       margin-bottom: 1em;
     }
-
     .student-info {
       text-align: left;
       font-size: 1.05em;
       line-height: 1.6;
     }
-
     #closeBtn {
       margin-top: 1.5em;
       padding: 0.6em 1.5em;
@@ -167,7 +149,6 @@
       cursor: pointer;
       font-family: inherit;
     }
-
     footer {
       font-size: 0.9em;
       color: #777;
@@ -180,7 +161,7 @@
 </head>
 <body>
   <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
-  <img src="logo.png" alt="โลโก้โรงเรียน" class="logo" />
+  <img src="logo.jpg" alt="โลโก้" class="logo" />
   <h1>ระบบค้นหาข้อมูลนักเรียน</h1>
   <p class="subtitle"><strong>คณะสีแสด</strong></p>
 
@@ -234,13 +215,3 @@
     }
 
     function closeResult() {
-      document.getElementById("result").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-    }
-  </script>
-</body>
-</html>
