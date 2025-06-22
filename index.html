@@ -194,7 +194,7 @@
       const id = document.getElementById("studentId").value.trim();
       if (!id) return;
 
-      const res = await fetch(`https://script.google.com/macros/s/AKfycbzy4iExJHGQWA796YIm_MYjaDNteu7NtEB_k_sbcSpo63-IyumV71JviETDtqx72PH8Ag/exec?studentId=${id}`);
+      const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
       const data = await res.json();
 
       const resultDiv = document.getElementById("result");
