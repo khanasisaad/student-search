@@ -36,16 +36,18 @@
       transition: all 0.3s ease;
     }
     .dark-toggle {
-      position: absolute;
+      position: fixed;
       top: 0.6em;
       right: 0.6em;
       background: none;
       border: none;
-      font-size: 1em;
+      font-size: 0.9em;
+      padding: 0.2em 0.4em;
       color: var(--fg);
       cursor: pointer;
       z-index: 1000;
-      opacity: 0.7;
+      opacity: 0.75;
+      line-height: 1;
     }
     .dark-toggle:hover {
       opacity: 1;
@@ -136,7 +138,12 @@
     }
     .room-number {
       font-size: 1.05em;
+      margin-bottom: 0.4em;
+    }
+    .contact-info {
+      font-size: 1em;
       margin-bottom: 1em;
+      color: var(--fg);
     }
     .student-info {
       text-align: left;
@@ -158,14 +165,14 @@
       color: #777;
       text-align: center;
       border-top: 1px solid var(--border);
-      margin-top: 4em;
-      padding-top: 1em;
+      margin-top: 6em;
+      padding-top: 1.2em;
     }
   </style>
 </head>
 <body>
   <button class="dark-toggle" id="toggleMode" onclick="toggleDarkMode()">🌙</button>
-  <img src="logo.jpg" alt="โลโก้" class="logo" />
+  <img src="logo.png" alt="โลโก้" class="logo" />
   <h1>ระบบค้นหาข้อมูลนักเรียน</h1>
   <p class="subtitle"><strong>คณะสีแสด</strong></p>
 
@@ -187,7 +194,7 @@
       const id = document.getElementById("studentId").value.trim();
       if (!id) return;
 
-      const res = await fetch(`https://script.google.com/macros/s/AKfycbwCGE1uLi5J2evWzhUvcZcp4kQ6W0dgB9tq4DPKZ-L40t7uJwZcrPTek5PCxqvCZn22RA/exec?studentId=${id}`);
+      const res = await fetch(`https://script.google.com/macros/s/AKfycbzy4iExJHGQWA796YIm_MYjaDNteu7NtEB_k_sbcSpo63-IyumV71JviETDtqx72PH8Ag/exec?studentId=${id}`);
       const data = await res.json();
 
       const resultDiv = document.getElementById("result");
@@ -202,6 +209,7 @@
           <div class="status-icon success">✓</div>
           <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
           <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
+          <div class="contact-info">ติดต่อ: ${data.contact}</div>
           <div class="student-info">
             ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
           </div>
