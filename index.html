@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ระบบค้นหาข้อมูลนักเรียน</title>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -11,7 +11,7 @@
       --fg: #212121;
       --accent: #ff7043;
       --popup: #fff;
-      --shadow: rgba(0, 0, 0, 0.2);
+      --shadow: rgba(0,0,0,0.2);
       --border: #ddd;
     }
     body.dark-mode {
@@ -22,80 +22,85 @@
       --shadow: rgba(255,255,255,0.08);
       --border: #333;
     }
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
     body {
       font-family: 'Prompt', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
       margin: 0;
       padding: 2em 1em 5em;
-      text-align: center;
+      background: var(--bg);
+      color: var(--fg);
       transition: all 0.3s ease;
+      text-align: center;
     }
     .dark-toggle {
       position: fixed;
-      top: 0.6em;
-      right: 0.6em;
+      top: 0.6em; right: 0.6em;
       background: none;
       border: none;
-      font-size: 0.9em;
-      padding: 0.2em 0.4em;
       color: var(--fg);
+      font-size: 0.9em;
       cursor: pointer;
       z-index: 1000;
-      opacity: 0.75;
-      line-height: 1;
+      opacity: 0.8;
     }
-    .dark-toggle:hover {
-      opacity: 1;
-    }
+    .dark-toggle:hover { opacity: 1; }
     .logo {
       width: 100px;
       margin: 3em auto 1em;
-      display: block;
       border-radius: 12px;
       box-shadow: 0 4px 12px var(--shadow);
-    }
-    h1 {
-      color: var(--accent);
-      font-size: 2em;
-      margin-bottom: 0.3em;
-    }
-    .subtitle {
-      margin-bottom: 1em;
-      font-size: 1.1em;
     }
     input, button {
       font-size: 1em;
       padding: 0.8em;
+      margin: 0.5em auto;
       max-width: 400px;
       width: 100%;
-      margin: 0.5em auto;
       border-radius: 6px;
       border: 1px solid var(--border);
       background: var(--bg);
       color: var(--fg);
     }
     button {
-      background-color: var(--accent);
-      color: white;
+      background: var(--accent);
+      color: #fff;
       border: none;
     }
     button:hover {
       transform: scale(1.02);
       box-shadow: 0 4px 10px var(--shadow);
     }
-    .overlay {
+
+    .overlay, .spinner-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.3);
-      display: none;
       z-index: 998;
     }
+    .overlay {
+      background: rgba(0,0,0,0.3);
+      display: none;
+    }
+    .spinner-overlay {
+      background: rgba(255,255,255,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    body.dark-mode .spinner-overlay {
+      background: rgba(0,0,0,0.4);
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 5px solid #ccc;
+      border-top: 5px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .result-modal {
       position: fixed;
       top: 50%; left: 50%;
@@ -104,18 +109,18 @@
       padding: 1.5em 1em;
       border-radius: 12px;
       box-shadow: 0 20px 40px var(--shadow);
-      width: 95%;
       max-width: 420px;
-      z-index: 999;
+      width: 95%;
       display: none;
-      text-align: center;
+      z-index: 999;
       color: var(--fg);
+      text-align: center;
     }
     .status-icon {
       width: 70px; height: 70px;
-      border-radius: 50%;
       font-size: 36px;
       margin: 0 auto 1em;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -136,18 +141,11 @@
       font-weight: 600;
       margin-bottom: 0.6em;
     }
-    .room-number {
-      font-size: 1.05em;
-      margin-bottom: 0.4em;
-    }
-    .contact-info {
-      font-size: 1em;
-      margin-bottom: 1em;
-      color: var(--fg);
-    }
+    .room-number { font-size: 1.05em; margin-bottom: 0.4em; }
+    .contact-info { font-size: 1em; margin-bottom: 1em; }
     .student-info {
-      text-align: left;
       font-size: 1.05em;
+      text-align: left;
       line-height: 1.6;
     }
     #closeBtn {
@@ -158,7 +156,6 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-family: inherit;
     }
     footer {
       font-size: 0.9em;
@@ -167,6 +164,7 @@
       border-top: 1px solid var(--border);
       margin-top: 6em;
       padding-top: 1.2em;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -185,8 +183,13 @@
     <button id="closeBtn" onclick="closeResult()">ปิด</button>
   </div>
 
+  <div id="loadingSpinner" class="spinner-overlay">
+    <div class="spinner"></div>
+  </div>
+
   <footer>
-    © 2025 พัฒนาโดยงานสวัสดิการข้อมูลคณะสีแสด /โรงเรียนเมืองสุราษฎร์ธานี
+    © 2025 สวัสดิการข้อมูลคณะสีแสด<br>
+    บงกชประภัสสร โรงเรียนเมืองสุราษฎร์ธานี
   </footer>
 
   <script>
@@ -194,35 +197,42 @@
       const id = document.getElementById("studentId").value.trim();
       if (!id) return;
 
-      const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
-      const data = await res.json();
+      document.getElementById("loadingSpinner").style.display = "flex";
 
-      const resultDiv = document.getElementById("result");
-      const content = document.getElementById("resultContent");
-      const overlay = document.getElementById("overlay");
+      try {
+        const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
+        const data = await res.json();
 
-      overlay.style.display = "block";
-      resultDiv.style.display = "block";
+        const resultDiv = document.getElementById("result");
+        const content = document.getElementById("resultContent");
+        const overlay = document.getElementById("overlay");
 
-      if (data.status === "success") {
-        content.innerHTML = `
-          <div class="status-icon success">✓</div>
-          <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
-          <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
-          <div class="contact-info">ติดต่อ: ${data.contact}</div>
-          <div class="student-info">
-            ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
-          </div>
-        `;
-      } else {
-        content.innerHTML = `
-          <div class="status-icon error">✗</div>
-          <div class="student-info" style="text-align:center;">
-            <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
-            หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
-            <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
-          </div>
-        `;
+        overlay.style.display = "block";
+        resultDiv.style.display = "block";
+
+        if (data.status === "success") {
+          content.innerHTML = `
+            <div class="status-icon success">✓</div>
+            <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
+            <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
+            <div class="contact-info">ติดต่อ: ${data.contact}</div>
+            <div class="student-info">
+              ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
+            </div>`;
+        } else {
+                    content.innerHTML = `
+            <div class="status-icon error">✗</div>
+            <div class="student-info" style="text-align:center;">
+              <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
+              หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
+              <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
+            </div>`;
+        }
+
+      } catch (error) {
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+      } finally {
+        document.getElementById("loadingSpinner").style.display = "none";
       }
     }
 
