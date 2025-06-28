@@ -14,37 +14,6 @@
       --shadow: rgba(0, 0, 0, 0.2);
       --border: #ddd;
     }
-    #spinnerOverlay {
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 999;
-}
-#spinnerOverlay .spinner {
-  border: 6px solid #eee;
-  border-top: 6px solid var(--accent);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  animation: spin 1s linear infinite;
-}
-
-    .spinner {
-  border: 6px solid var(--border);
-  border-top: 6px solid var(--accent);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  animation: spin 1s linear infinite;
-  margin: 2em auto;
-  display: none;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
     body.dark-mode {
       --bg: #121212;
       --fg: #f5f5f5;
@@ -191,6 +160,18 @@
       cursor: pointer;
       font-family: inherit;
     }
+    .spinner {
+      border: 6px solid var(--border);
+      border-top: 6px solid var(--accent);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     footer {
       font-size: 0.9em;
       color: #777;
@@ -210,12 +191,14 @@
   <input id="studentId" placeholder="กรอกรหัสประจำตัวนักเรียน" onkeydown="if(event.key==='Enter') searchStudent()" />
   <button onclick="searchStudent()">ค้นหา</button>
 
+  <!-- 🔄 Spinner Overlay -->
+  <div id="spinnerOverlay" class="overlay" style="display:none; justify-content:center; align-items:center; flex-direction:column;">
+    <div class="spinner"></div>
+    <div style="margin-top: 1em; color: white; font-size: 1.2em;">กำลังค้นหา...</div>
+  </div>
+
+  <!-- 📋 ผลลัพธ์ -->
   <div class="overlay" id="overlay" onclick="closeResult()"></div>
-  <div id="spinner" class="spinner"></div>
-  <div id="spinnerOverlay" class="overlay" style="display: none; justify-content: center; align-items: center; flex-direction: column;">
-  <div class="spinner"></div>
-  <div style="margin-top: 1em; color: white; font-size: 1.2em;">กำลังค้นหา...</div>
-</div>
   <div id="result" class="result-modal">
     <div id="resultContent"></div>
     <button id="closeBtn" onclick="closeResult()">ปิด</button>
@@ -229,59 +212,55 @@
 
   <script>
     async function searchStudent() {
-  const id = document.getElementById("studentId").value.trim();
-  if (!id) return;
+      const id = document.getElementById("studentId").value.trim();
+      if (!id) return;
 
-  const spinner = document.getElementById("spinner");
-  const resultDiv = document.getElementById("result");
-  const content = document.getElementById("resultContent");
-  const overlay = document.getElementById("overlay");
-  const spinnerOverlay = document.getElementById("spinnerOverlay");
+      const spinnerOverlay = document.getElementById("spinnerOverlay");
+      const resultDiv = document.getElementById("result");
+      const content = document.getElementById("resultContent");
+      const overlay = document.getElementById("overlay");
 
-  // ✅ แสดง spinner แบบ overlay ตรงกลาง
-  spinnerOverlay.style.display = "flex";
-  resultDiv.style.display = "none";
-  overlay.style.display = "block";
+      spinnerOverlay.style.display = "flex";
+      resultDiv.style.display = "none";
+      overlay.style.display = "block";
 
-  try {
-    const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
-    const data = await res.json();
+      try {
+        const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
+        const data = await res.json();
 
-    if (data.status === "success") {
-      content.innerHTML = `
-        <div class="status-icon success">✓</div>
-        <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
-        <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
-        <div class="contact-info">ติดต่อ: ${data.contact}</div>
-        <div class="student-info">
-          ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
-        </div>
-      `;
-    } else {
-      content.innerHTML = `
-        <div class="status-icon error">✗</div>
-        <div class="student-info" style="text-align:center;">
-          <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
-          หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
-          <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
-        </div>
-      `;
+        if (data.status === "success") {
+          content.innerHTML = `
+            <div class="status-icon success">✓</div>
+            <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
+            <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
+            <div class="contact-info">ติดต่อ: ${data.contact}</div>
+            <div class="student-info">
+              ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
+            </div>
+          `;
+        } else {
+          content.innerHTML = `
+            <div class="status-icon error">✗</div>
+            <div class="student-info" style="text-align:center;">
+              <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
+              หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
+              <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
+            </div>
+          `;
+        }
+      } catch (error) {
+        content.innerHTML = `
+          <div class="status-icon error">✗</div>
+          <div class="student-info" style="text-align:center;">
+            <strong style="color:#c62828;">เกิดข้อผิดพลาดในการเชื่อมต่อ</strong><br><br>
+            กรุณาลองใหม่อีกครั้งในภายหลัง
+          </div>
+        `;
+      }
+
+      spinnerOverlay.style.display = "none";
+      resultDiv.style.display = "block";
     }
-  } catch (error) {
-    content.innerHTML = `
-      <div class="status-icon error">✗</div>
-      <div class="student-info" style="text-align:center;">
-        <strong style="color:#c62828;">เกิดข้อผิดพลาดในการเชื่อมต่อ</strong><br><br>
-        กรุณาลองใหม่อีกครั้งในภายหลัง
-      </div>
-    `;
-  }
-
-  // ✅ ซ่อน spinner แล้วแสดงผลลัพธ์
-  spinnerOverlay.style.display = "none";
-  resultDiv.style.display = "block";
-}
-
 
     function closeResult() {
       document.getElementById("result").style.display = "none";
