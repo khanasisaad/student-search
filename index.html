@@ -14,6 +14,21 @@
       --shadow: rgba(0, 0, 0, 0.2);
       --border: #ddd;
     }
+    .spinner {
+  border: 6px solid var(--border);
+  border-top: 6px solid var(--accent);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin: 2em auto;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
     body.dark-mode {
       --bg: #121212;
       --fg: #f5f5f5;
@@ -88,37 +103,13 @@
       transform: scale(1.02);
       box-shadow: 0 4px 10px var(--shadow);
     }
-More actions
-    .overlay, .spinner-overlay {
+    .overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.3);
       display: none;
       z-index: 998;
-    }
-    .spinner-overlay {
-      background: rgba(255,255,255,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-    body.dark-mode .spinner-overlay {
-      background: rgba(0,0,0,0.4);
-    }
-    .spinner {
-      width: 48px; height: 48px;
-      border: 5px solid #ccc;
-      border-top: 5px solid var(--accent);
-      border-radius: 50%;
-      animation: spin 1s ease-in-out infinite;
-    }
-    @keyframes spin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-Add commentMore actions
-
     }
     .result-modal {
       position: fixed;
@@ -204,63 +195,72 @@ Add commentMore actions
   <button onclick="searchStudent()">ค้นหา</button>
 
   <div class="overlay" id="overlay" onclick="closeResult()"></div>
+  <div id="spinner" class="spinner"></div>
   <div id="result" class="result-modal">
     <div id="resultContent"></div>
     <button id="closeBtn" onclick="closeResult()">ปิด</button>
-  </div>
-    <div id="loadingSpinner" class="spinner-overlay">
-    <div class="spinner"></div>
   </div>
 
   <footer>
   © 2025 สวัสดิการข้อมูลคณะสีแสด<br>
   บงกชประภัสสร โรงเรียนเมืองสุราษฎร์ธานี
-  </footer>
+</footer>
 
 
   <script>
     async function searchStudent() {
-      const id = document.getElementById("studentId").value.trim();
-      if (!id) return;
+  const id = document.getElementById("studentId").value.trim();
+  if (!id) return;
 
-    document.getElementById("loadingSpinner").style.display = "flex";
+  const spinner = document.getElementById("spinner");
+  const resultDiv = document.getElementById("result");
+  const content = document.getElementById("resultContent");
+  const overlay = document.getElementById("overlay");
 
-      try {
-        const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
-        const data = await res.json();
+  // แสดงวงกลมหมุน และซ่อนผลลัพธ์เก่า
+  spinner.style.display = "block";
+  resultDiv.style.display = "none";
+  overlay.style.display = "block";
 
-        const resultDiv = document.getElementById("result");
-        const content = document.getElementById("resultContent");
-        const overlay = document.getElementById("overlay");
+  try {
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
+    const data = await res.json();
 
-      overlay.style.display = "block";
-      resultDiv.style.display = "block";
+    if (data.status === "success") {
+      content.innerHTML = `
+        <div class="status-icon success">✓</div>
+        <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
+        <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
+        <div class="contact-info">ติดต่อ: ${data.contact}</div>
+        <div class="student-info">
+          ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
+        </div>
+      `;
+    } else {
+      content.innerHTML = `
+        <div class="status-icon error">✗</div>
+        <div class="student-info" style="text-align:center;">
+          <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
+          หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
+          <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
+        </div>
+      `;
+    }
+  } catch (error) {
+    content.innerHTML = `
+      <div class="status-icon error">✗</div>
+      <div class="student-info" style="text-align:center;">
+        <strong style="color:#c62828;">เกิดข้อผิดพลาดในการเชื่อมต่อ</strong><br><br>
+        กรุณาลองใหม่อีกครั้งในภายหลัง
+      </div>
+    `;
+  }
 
-      if (data.status === "success") {
-        content.innerHTML = `
-  <div class="status-icon success">✓</div>
-  <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
-  <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
-  <div class="contact-info">ติดต่อ: ${data.contact}</div>
-  <div class="student-info">
-    ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
-  </div>
-`; // ❌ ไม่มีปุ่มปิดซ้ำ
+  // ซ่อน spinner แล้วแสดงผลลัพธ์
+  spinner.style.display = "none";
+  resultDiv.style.display = "block";
+}
 
-      } else {
-        content.innerHTML = `
-          <div class="status-icon error">✗</div>
-          <div class="student-info" style="text-align:center;">
-            <strong style="color:#c62828;">ไม่พบข้อมูลในฐานข้อมูลคณะสีแสด</strong><br><br>
-            หากคิดว่าเป็นความผิดพลาดของระบบ กรุณาติดต่อ<br>
-            <a href="https://line.me/ti/p/rRULUuwLC7" target="_blank">LINE ผู้ดูแลระบบ</a>
-          </div>
-        `;
-      } catch (error) {
-        alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-      } finally {
-        document.getElementById("loadingSpinner").style.display = "none";
-      }
     }
 
     function closeResult() {
