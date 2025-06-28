@@ -96,9 +96,6 @@ More actions
       background: rgba(0, 0, 0, 0.3);
       display: none;
       z-index: 998;
-          .overlay {
-      background: rgba(0,0,0,0.3);
-      display: none;
     }
     .spinner-overlay {
       background: rgba(255,255,255,0.6);
@@ -226,8 +223,6 @@ Add commentMore actions
       const id = document.getElementById("studentId").value.trim();
       if (!id) return;
 
-      const res = await fetch(`https://script.google.com/macros/s/AKfycbwQDuHrue6h5XIryvZE3c-kJsOyUxUkRd7VuFMsrob-kkgYtkMi2cW7HWcbEJOEA68xBw/exec?studentId=${id}`);
-      const data = await res.json();
     document.getElementById("loadingSpinner").style.display = "flex";
 
       try {
