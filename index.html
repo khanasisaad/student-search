@@ -14,6 +14,22 @@
       --shadow: rgba(0, 0, 0, 0.2);
       --border: #ddd;
     }
+    #spinnerOverlay {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 999;
+}
+#spinnerOverlay .spinner {
+  border: 6px solid #eee;
+  border-top: 6px solid var(--accent);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+}
+
     .spinner {
   border: 6px solid var(--border);
   border-top: 6px solid var(--accent);
@@ -196,6 +212,10 @@
 
   <div class="overlay" id="overlay" onclick="closeResult()"></div>
   <div id="spinner" class="spinner"></div>
+  <div id="spinnerOverlay" class="overlay" style="display: none; justify-content: center; align-items: center; flex-direction: column;">
+  <div class="spinner"></div>
+  <div style="margin-top: 1em; color: white; font-size: 1.2em;">กำลังค้นหา...</div>
+</div>
   <div id="result" class="result-modal">
     <div id="resultContent"></div>
     <button id="closeBtn" onclick="closeResult()">ปิด</button>
@@ -216,9 +236,10 @@
   const resultDiv = document.getElementById("result");
   const content = document.getElementById("resultContent");
   const overlay = document.getElementById("overlay");
+  const spinnerOverlay = document.getElementById("spinnerOverlay");
 
-  // แสดงวงกลมหมุน และซ่อนผลลัพธ์เก่า
-  spinner.style.display = "block";
+  // ✅ แสดง spinner แบบ overlay ตรงกลาง
+  spinnerOverlay.style.display = "flex";
   resultDiv.style.display = "none";
   overlay.style.display = "block";
 
@@ -256,12 +277,11 @@
     `;
   }
 
-  // ซ่อน spinner แล้วแสดงผลลัพธ์
-  spinner.style.display = "none";
+  // ✅ ซ่อน spinner แล้วแสดงผลลัพธ์
+  spinnerOverlay.style.display = "none";
   resultDiv.style.display = "block";
 }
 
-    }
 
     function closeResult() {
       document.getElementById("result").style.display = "none";
