@@ -238,14 +238,15 @@ Add commentMore actions
 
       if (data.status === "success") {
         content.innerHTML = `
-          <div class="status-icon success">✓</div>
-          <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
-          <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
-          <div class="contact-info">ติดต่อ: ${data.contact}</div>
-          <div class="student-info">
-            ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
-          </div>
-        `;
+  <div class="status-icon success">✓</div>
+  <div class="student-name">${data.prefix} ${data.firstname} ${data.lastname}</div>
+  <div class="room-number">ห้อง: ${data.room} | เลขที่: ${data.number}</div>
+  <div class="contact-info">ติดต่อ: ${data.contact}</div>
+  <div class="student-info">
+    ${data.roles.map((r, i) => r ? `<strong>หน้าที่ ${i + 1}:</strong> ${r}<br>` : '').join('')}
+  </div>
+`; // ❌ ไม่มีปุ่มปิดซ้ำ
+
       } else {
         content.innerHTML = `
           <div class="status-icon error">✗</div>
